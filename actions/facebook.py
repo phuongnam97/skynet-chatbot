@@ -1,5 +1,8 @@
 from selenium.webdriver.remote.webdriver import WebDriver
+from actions.handlers import hello
 import re
+
+regex = re.compile('^bleep blop')
 
 
 def login(browser: WebDriver, username: str, pwd: str) -> WebDriver:
@@ -19,7 +22,6 @@ def check_message(browser: WebDriver) -> list:
     ret_m = []
     skip_texts = ['', 'Sent from Mobile', 'Sent from Messenger', 'Sent from Web']
     messages = browser.find_elements_by_css_selector('#messageGroup > div:nth-child(2) span')
-    regex = re.compile('^bleep blop')
     for message in messages:
         text = message.text
         if text in skip_texts:
@@ -31,8 +33,10 @@ def check_message(browser: WebDriver) -> list:
 
 
 def reply_message(browser: WebDriver, m: str) -> WebDriver:
-    regex = re.compile('^hey')
-    if regex.match(m.lower()):
-        browser.find_element_by_id('composerInput').send_keys('bleep blop I\'m a robot')
-        browser.find_element_by_css_selector('#composer_form input[type="submit"][name="send"]').click()
+    hello.handle(browser, m)
     return browser
+
+
+def _send_message(browser: WebDriver, m: str) -> None:
+    browser.find_element_by_id('composerInput').send_keys(m)
+    browser.find_element_by_css_selector('#composer_form input[type="submit"][name="send"]').click()
